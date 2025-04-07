@@ -99,7 +99,7 @@ xi = 1/Q
 A = l*b
 deltam = 0
 m = rho*A*h
-T = (epsilon0*A)/(2*m*omega0**2*d**3)
+T = (epsilon0*A)/(2*m*(omega0**2)*d**3)
 
 
 M = 1 + (deltam/m)
