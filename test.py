@@ -71,3 +71,5 @@ if __name__ == "__main__":
     print("Déplacements :", u)
     print("Vitesses :", v)
     print("Accélérations :", a)
+
+    print()
