@@ -191,6 +191,7 @@ while (OMEGA>OMEGA_debut):
 
 ax.plot(OME2, AMPL2, color='blue',marker = '<', label='descente en fréquence')  # Trace la courbe de réponse.
 
+#Récupération des données de la courbe de reponse prof
 data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
 OMEGA_data = data[:, 0]
 AMPL_data = data[:, 1]
