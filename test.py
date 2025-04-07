@@ -56,4 +56,5 @@ def newmark_beta(m, c, k, f, dt, u0, v0, beta=0.25, gamma=0.5):
 
     return u, v, a
 
-print('merci mon coeur <3')
+print('merci mon coeur <3' \
+'oueeee')
