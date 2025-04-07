@@ -102,7 +102,7 @@ m = rho*A*h
 T = (epsilon0*A)/(2*m*omega0**2*d**3)
 
 
-M = 1 + deltam/m
+M = 1 + (deltam/m)
 C = xi
 K = 1 - 2*T*Vdc**2
 OMEGA = 1
@@ -116,9 +116,9 @@ t_init=0               # temps initial
 NT=nb_per*nb_pts_per+1 # Nb total de pas de temps
 
 # Résolution equation mvt
-"""
-OMEGA=1
 
+
+'''
 Y0=1 ; dY0=0             # conditions initiales
 start = time.process_time()
 tt,Yt,dYt=Newmark(Y0,dY0,t_init,dt,NT,omega0)   # Integration par Newmark
@@ -130,8 +130,8 @@ ax.plot(tt, Yt, color='red',marker = '.', label='Newmark')  # Trace le deplaceme
 plt.xlabel("Temps $t$")        # titre axe horizontal
 plt.ylabel("Déplacement $y(t)$")  # titre axe vertical
 plt.grid(color = 'gray', linestyle = '--', linewidth = 0.5)
-plt.show()
-"""
+plt.show()'''
+
 # Courbe de réponse
 
 OMEGA_debut=0.90;OMEGA_fin=1.10;dOMEGA=0.005
@@ -141,7 +141,7 @@ t_init=0               # temps initial
 NT=nb_per*nb_pts_per   # Nb total de pas de temps
 npas=int((OMEGA_fin-OMEGA_debut)/dOMEGA+1)
 # conditions initiales
-Y0=1;dY0=0
+Y0=0.25;dY0=0
 k=0; OMEGA=OMEGA_debut
 
 OME=zeros((npas,1))
