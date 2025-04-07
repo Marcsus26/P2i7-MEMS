@@ -16,7 +16,7 @@ def calc_Fnl(T,Vdc,y):
     return Fnl
 
 def calc_dFnl(T,Vdc,y,dY=0):
-    dFY= -6*T*Vdc**2*(y+2*y**2)
+    dFY= -6*T*(Vdc**2)*(y+2*y**2)
     dFdY= 0
     return dFY,dFdY
 
@@ -134,9 +134,9 @@ plt.show()
 """
 # Courbe de réponse
 
-OMEGA_debut=0.985;OMEGA_fin=1.005;dOMEGA=0.005
-nb_pts_per=50          # nb de points par periode pour l integration temporelle
-nb_per=50              # nb de periodes pour le calcul temporel
+OMEGA_debut=0.90;OMEGA_fin=1.10;dOMEGA=0.005
+nb_pts_per=50         # nb de points par periode pour l integration temporelle
+nb_per=500              # nb de periodes pour le calcul temporel
 t_init=0               # temps initial
 NT=nb_per*nb_pts_per   # Nb total de pas de temps
 npas=int((OMEGA_fin-OMEGA_debut)/dOMEGA+1)
