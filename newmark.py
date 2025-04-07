@@ -7,8 +7,8 @@ import time
 
 #definition des fonctions
 
-def calc_P(T,Vdc,Vac,OMEGA,tau):
-    P= T*Vdc**2 + 2*T*Vdc*Vac*np.cos(OMEGA*tau)
+def calc_P(T,Vdc,Vac,OMEGA,t):
+    P= T*Vdc**2 + 2*T*Vdc*Vac*np.cos(OMEGA*t)
     return P
 
 def calc_Fnl(T,Vdc,y):
@@ -25,7 +25,6 @@ def Newmark(Y0,dY0,t_init,dt,NT,omega0):
     precNR=1.e-9
     # C.I. déplacement et vitesse
     t = t_init
-    tau = omega0*t
     Y=Y0;dY=dY0
     # initialisation des variables
     Fnl=0
@@ -37,7 +36,7 @@ def Newmark(Y0,dY0,t_init,dt,NT,omega0):
     Yt=zeros((NT,1))      # déplacement
     dYt=zeros((NT,1))     # vitesse
     
-    P = calc_P(T,Vdc,Vac,OMEGA,tau)     # calcul de l'effort extérieur
+    P = calc_P(T,Vdc,Vac,OMEGA,t)     # calcul de l'effort extérieur
     Fnl=calc_Fnl(T,Vdc,Y)   # calcul de l'effort non-linéaire
     ddY=(P-C*dY-K*Y-Fnl)/M   # accélération initiale
     tt[0]=t
@@ -47,14 +46,13 @@ def Newmark(Y0,dY0,t_init,dt,NT,omega0):
     # Boucle sur les pas de temps
     for n in range(1,NT):
         t=t+dt
-        tau = omega0*t
         # prediction
         iter=0
         Y = Y+ dt*dY+(dt**2/2)*ddY
         dY = dY + dt*ddY
         ddY = ddY
         # Calcul du residu
-        P=calc_P(T,Vdc,Vac,OMEGA,tau)
+        P=calc_P(T,Vdc,Vac,OMEGA,t)
         Fnl=calc_Fnl(T,Vdc,Y)
         res=P-M*ddY-C*dY-K*Y-Fnl
         normres=abs(res/P)
@@ -99,7 +97,7 @@ xi = 1/Q
 A = l*b
 deltam = 0
 m = rho*A*h
-T = (epsilon0*A)/(2*m*(omega0**2)*d**3)
+T = (epsilon0*A)/(2*m*omega0**2*d**3)
 
 
 M = 1 + (deltam/m)
