@@ -21,7 +21,7 @@ def calc_dFnl(T,Vdc,y,dY=0):
     return dFY,dFdY
 
 #Fonction newmark
-def Newmark(X0,dX0,t_init,dt,NT):
+def Newmark(X0,dX0,t_init,dt,NT,omega0):
     precNR=1.e-9
     # C.I. déplacement et vitesse
     t = t_init
@@ -37,7 +37,7 @@ def Newmark(X0,dX0,t_init,dt,NT):
     Yt=zeros((NT,1))      # déplacement
     dYt=zeros((NT,1))     # vitesse
     
-    P=calc_P(T,Vdc,Vac,OMEGA,tau)     # calcul de l'effort extérieur
+    P = calc_P(T,Vdc,Vac,OMEGA,tau)     # calcul de l'effort extérieur
     Fnl=calc_Fnl(T,Vdc,Y)   # calcul de l'effort non-linéaire
     ddY=(P-C*dY-K*Y-Fnl)/M   # accélération initiale
     tt[0]=t
@@ -54,7 +54,7 @@ def Newmark(X0,dX0,t_init,dt,NT):
         dY = dY + dt*ddY
         ddY = ddY
         # Calcul du residu
-        P=calc_P(Vdc,Vac,OMEGA,tau)
+        P=calc_P(T,Vdc,Vac,OMEGA,tau)
         Fnl=calc_Fnl(T,Vdc,Y)
         res=P-M*ddY-C*dY-K*Y-Fnl
         normres=abs(res/P)
@@ -121,14 +121,14 @@ OMEGA=1
 
 Y0=1 ; dY0=0             # conditions initiales
 start = time.process_time()
-tt,Yt,dYt=Newmark(Y0,dY0,t_init,dt,NT)   # Integration par Newmark
+tt,Yt,dYt=Newmark(Y0,dY0,t_init,dt,NT,omega0)   # Integration par Newmark
 print('ellapsed time: ',time.process_time() - start)
 
 fig = plt.figure(figsize=(10, 4))  # Crée une figure de dimensions données.
 ax = fig.add_subplot()
 ax.plot(tt, Yt, color='red',marker = 'o', label='Newmark')  # Trace le deplacement en fonction du temps.
 plt.xlabel("Temps $t$")        # titre axe horizontal
-plt.ylabel("Déplacement $x(t)$")  # titre axe vertical
+plt.ylabel("Déplacement $y(t)$")  # titre axe vertical
 plt.grid(color = 'gray', linestyle = '--', linewidth = 0.5)
 plt.show()
 
