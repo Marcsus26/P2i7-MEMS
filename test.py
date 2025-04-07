@@ -56,20 +56,4 @@ def newmark_beta(m, c, k, f, dt, u0, v0, beta=0.25, gamma=0.5):
 
     return u, v, a
 
-# Exemple d'utilisation
-if __name__ == "__main__":
-    m = 1.0  # Masse
-    c = 0.2  # Amortissement
-    k = 10.0  # Raideur
-    f = np.ones(100)  # Force constante
-    dt = 0.1  # Pas de temps
-    u0 = 0.0  # Déplacement initial
-    v0 = 0.0  # Vitesse initiale
-
-    u, v, a = newmark_beta(m, c, k, f, dt, u0, v0)
-
-    print("Déplacements :", u)
-    print("Vitesses :", v)
-    print("Accélérations :", a)
-
-    print()
+print('bisous')
