@@ -90,11 +90,9 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
     return OME[:k], AMPL[:k]
 
 # Affichage des résultats
-def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,tracer_data=False):
-    fig = plt.figure(figsize=(10, 4))
-    ax = fig.add_subplot()
-    ax.plot(OME, AMPL, color='red', marker='>', label='montée en fréquence')
-    ax.plot(OME2, AMPL2, color='blue', marker='<', label='descente en fréquence')
+def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False):
+    ax.plot(OME, AMPL, marker='>', label=f'montée en fréquence pour {deltam}')
+    ax.plot(OME2, AMPL2, marker='<', label=f'descente en fréquence pour {deltam}')
     if tracer_data:
         ax.plot(OMEGA_data, AMPL_data, color='green', marker='o', label='données fichier')
     plt.xlabel(r"$\Omega$ pulsation de l'excitation")
