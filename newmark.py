@@ -121,4 +121,3 @@ if __name__ == "__main__":
 
     # Affichage
     plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data)
-
