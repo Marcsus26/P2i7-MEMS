@@ -52,7 +52,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
     return tt, Yt, dYt
 
 # Initialisation des paramètres
-def init_params():
+def init_params(deltam=0):
     rho, l, b, h, d = 2500, 250e-6, 40e-6, 1e-6, 0.03e-6
     Vdc, Vac = 5, 5 / 10
     epsilon0 = 8.5e-12
@@ -61,7 +61,6 @@ def init_params():
     Q = 1000
     xi = 1 / Q
     A = l * b
-    deltam = 0
     m = rho * A * h
     T = (epsilon0 * A) / (2 * m * omega0**2 * d**3)
     M = 1 + (deltam / m)
