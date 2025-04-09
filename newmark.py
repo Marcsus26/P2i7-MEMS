@@ -132,7 +132,7 @@ plt.show()'''
 
 # Courbe de réponse
 
-OMEGA_debut=0.90;OMEGA_fin=1.10;dOMEGA=0.005
+OMEGA_debut=0.9;OMEGA_fin=1.10;dOMEGA=0.005
 nb_pts_per=50         # nb de points par periode pour l integration temporelle
 nb_per=500              # nb de periodes pour le calcul temporel
 t_init=0               # temps initial
