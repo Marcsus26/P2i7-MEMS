@@ -31,7 +31,7 @@ OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
 
 # Affichage
 nk.plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,ax)
-deltam = 1e-13
+deltam = 1e-15
 T, Vdc, Vac, omega0, M, C, K = nk.init_params(deltam)
 nb_pts_per, nb_per = 50, 500
 
@@ -57,6 +57,6 @@ nk.plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,ax,deltam)
 
 print(val1)
 print(val2)
-print(f"La différence de OMEGA est de : {abs(val1-val2)}")
+print(f"La différence de OMEGA est de : {abs(val1-val2)[0]}")
 
 plt.show()
