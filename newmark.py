@@ -69,13 +69,42 @@ def init_params(deltam=0):
     return T, Vdc, Vac, omega0, M, C, K
 
 # Calcul de la courbe de réponse
-def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGA, nb_pts_per, nb_per):
-    npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGA) + 1)
+def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per, tolerance=0.00001):
+    npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1)
     OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
     Y0, dY0 = 0.25, 0
     k, OMEGA = 0, OMEGA_debut
 
-    while (dOMEGA > 0 and OMEGA <= OMEGA_fin) or (dOMEGA < 0 and OMEGA >= OMEGA_fin):
+    while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
+        OME[k] = OMEGA
+        periode = 2 * np.pi / OMEGA
+        dt = periode / nb_pts_per
+        NT = nb_per * nb_pts_per
+        tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
+        AMPL[k] = max(Yt[-3 * nb_pts_per:])
+        print(f'ome= {OME[k, 0]:0.5f}  y= {AMPL[k, 0]:0.5g}', end="\r", flush=True)
+        Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
+        OMEGA += dOMEGAinit
+        k += 1
+    
+    i_max = 0
+    for i in range(len(AMPL)):
+        if AMPL[i]>AMPL[i_max]:
+            i_max = i
+    
+    npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 +(0.002)/tolerance)
+    OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
+    Y0, dY0 = 0.25, 0
+    k, OMEGA = 0, OMEGA_debut
+
+    while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
+        if (OME[i_max]-0.001) < OME[k] and (OME[i_max]+0.001) > OME[k]:
+            if dOMEGAinit > 0:
+                dOMEGA = tolerance
+            else:
+                dOMEGA = -tolerance
+        else :
+            dOMEGA = dOMEGAinit
         OME[k] = OMEGA
         periode = 2 * np.pi / OMEGA
         dt = periode / nb_pts_per
@@ -87,7 +116,8 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
         OMEGA += dOMEGA
         k += 1
 
-    return OME[:k], AMPL[:k]
+
+    return OME[:k], AMPL[:k], i_max
 
 # Affichage des résultats
 def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False):
@@ -99,26 +129,26 @@ def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, delta
     plt.ylabel("Amplitude de la réponse = $max(y(t))$")
     plt.title("Courbe de réponse")
     plt.legend()
-    plt.xlim(0.985,1)
+    plt.xlim(0.988,0.996)
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
 
-# Main
-if __name__ == "__main__":
-    T, Vdc, Vac, omega0, M, C, K = init_params()
-    OMEGA_debut, OMEGA_fin, dOMEGA = 0.9, 1.10, 0.005
-    nb_pts_per, nb_per = 50, 500
+# # Main
+# if __name__ == "__main__":
+#     T, Vdc, Vac, omega0, M, C, K = init_params()
+#     OMEGA_debut, OMEGA_fin, dOMEGA = 0.9, 1.10, 0.005
+#     nb_pts_per, nb_per = 50, 500
 
-    OME, AMPL = compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGA, nb_pts_per, nb_per)
+#     OME, AMPL,i_max = compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGA, nb_pts_per, nb_per)
 
-    # Descente en fréquence
-    OME2, AMPL2 = compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_fin, OMEGA_debut, -dOMEGA, nb_pts_per, nb_per)
+#     # Descente en fréquence
+#     OME2, AMPL2,i_max = compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_fin, OMEGA_debut, -dOMEGA, nb_pts_per, nb_per)
 
-    # Chargement des données de la courbe de réponse
-    data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
-    OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
+#     # Chargement des données de la courbe de réponse
+#     data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
+#     OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
 
-    # Affichage
-    plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,tracer_data=True)
+#     # Affichage
+#     plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,tracer_data=True)
 
-    plt.show()
+#     plt.show()
