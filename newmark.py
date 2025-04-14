@@ -82,7 +82,7 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
         NT = nb_per * nb_pts_per
         tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
         AMPL[k] = max(Yt[-3 * nb_pts_per:])
-        print(f'ome= {OME[k, 0]:0.5f}  y= {AMPL[k, 0]:0.5g}', end="\r", flush=True)
+        #print(f'ome= {OME[k, 0]:0.5f}  y= {AMPL[k, 0]:0.5g}', end="\r", flush=True)
         Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
         OMEGA += dOMEGAinit
         k += 1
@@ -95,7 +95,7 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
             if AMPL[i]>AMPL[i_max]:
                 i_max = i
         val = OME[i_max]
-        print(f"val = {val}")
+        #print(f"val = {val}")
 
         npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 +(0.002)/tolerance)
         OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
@@ -113,12 +113,12 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
             NT = nb_per * nb_pts_per
             tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
             AMPL[k] = max(Yt[-3 * nb_pts_per:])
-            print(f'ome= {OME[k, 0]:0.5f}  y= {AMPL[k, 0]:0.5g}', end="\r", flush=True)
+            #print(f'ome= {OME[k, 0]:0.5f}  y= {AMPL[k, 0]:0.5g}', end="\r", flush=True)
             Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
             OMEGA += dOMEGA
             k += 1
 
-
+    print("fin")
     return OME[:k], AMPL[:k]
 
 # Affichage des résultats

@@ -26,7 +26,7 @@ OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
 
 # # Affichage
 # nk.plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,ax)
-def courbe_reponse_delta_m(OMEGA_debut, OMEGA_fin, dOMEGA, ax, deltam=0):
+def courbe_reponse_delta_m(OMEGA_debut, OMEGA_fin, dOMEGA, deltam=0):
     T, Vdc, Vac, omega0, M, C, K = nk.init_params(deltam)
     nb_pts_per, nb_per = 50, 500
 
@@ -43,5 +43,5 @@ def courbe_reponse_delta_m(OMEGA_debut, OMEGA_fin, dOMEGA, ax, deltam=0):
     OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
 
 # Affichage
-    nk.plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,ax,deltam, True)
+    # nk.plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,ax,deltam, True)
     return OMEGA_MAX
