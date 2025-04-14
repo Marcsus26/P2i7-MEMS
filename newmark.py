@@ -18,7 +18,7 @@ def calc_dFnl(T, Vdc, y):
 
 # Fonction Newmark
 def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
-    precNR = 1.e-9
+    precNR = 1.e-15
     t = t_init
     Y, dY = Y0, dY0
     tt, Yt, dYt = zeros((NT, 1)), zeros((NT, 1)), zeros((NT, 1))
@@ -99,6 +99,7 @@ def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, delta
     plt.ylabel("Amplitude de la réponse = $max(y(t))$")
     plt.title("Courbe de réponse")
     plt.legend()
+    plt.xlim(0.985,1)
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
 

@@ -52,7 +52,7 @@ data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
 OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
 
 # Affichage
-nk.plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,ax,deltam)
+nk.plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,ax,deltam,True)
 
 
 print(val1)
