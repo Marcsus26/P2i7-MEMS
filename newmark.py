@@ -18,7 +18,7 @@ def calc_dFnl(T, Vdc, y):
 
 # Fonction Newmark
 def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
-    precNR = 1.e-15
+    precNR = 1.e-12
     t = t_init
     Y, dY = Y0, dY0
     tt, Yt, dYt = zeros((NT, 1)), zeros((NT, 1)), zeros((NT, 1))
@@ -87,44 +87,46 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
         OMEGA += dOMEGAinit
         k += 1
     
-    i_max = 0
-    for i in range(len(AMPL)):
-        if AMPL[i]>AMPL[i_max]:
-            i_max = i
-    
-    npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 +(0.002)/tolerance)
-    OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
-    Y0, dY0 = 0.25, 0
-    k, OMEGA = 0, OMEGA_debut
+    val = -1000
 
-    while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
-        if (OME[i_max]-0.001) < OME[k] and (OME[i_max]+0.001) > OME[k]:
-            if dOMEGAinit > 0:
-                dOMEGA = tolerance
-            else:
+    if dOMEGAinit < 0:
+        i_max = 0
+        for i in range(len(AMPL)):
+            if AMPL[i]>AMPL[i_max]:
+                i_max = i
+        val = OME[i_max]
+        print(f"val = {val}")
+
+        npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 +(0.002)/tolerance)
+        OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
+        Y0, dY0 = 0.25, 0
+        k, OMEGA = 0, OMEGA_debut
+
+        while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
+            OME[k] = OMEGA
+            if (val-0.001) < OME[k] and  (val+0.001) > OME[k]:
                 dOMEGA = -tolerance
-        else :
-            dOMEGA = dOMEGAinit
-        OME[k] = OMEGA
-        periode = 2 * np.pi / OMEGA
-        dt = periode / nb_pts_per
-        NT = nb_per * nb_pts_per
-        tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
-        AMPL[k] = max(Yt[-3 * nb_pts_per:])
-        print(f'ome= {OME[k, 0]:0.5f}  y= {AMPL[k, 0]:0.5g}', end="\r", flush=True)
-        Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
-        OMEGA += dOMEGA
-        k += 1
+            else :
+                dOMEGA = dOMEGAinit
+            periode = 2 * np.pi / OMEGA
+            dt = periode / nb_pts_per
+            NT = nb_per * nb_pts_per
+            tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
+            AMPL[k] = max(Yt[-3 * nb_pts_per:])
+            print(f'ome= {OME[k, 0]:0.5f}  y= {AMPL[k, 0]:0.5g}', end="\r", flush=True)
+            Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
+            OMEGA += dOMEGA
+            k += 1
 
 
-    return OME[:k], AMPL[:k], i_max
+    return OME[:k], AMPL[:k]
 
 # Affichage des résultats
 def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False):
-    ax.plot(OME, AMPL, marker='>', label=f'montée en fréquence pour {deltam}')
-    ax.plot(OME2, AMPL2, marker='<', label=f'descente en fréquence pour {deltam}')
     if tracer_data:
         ax.plot(OMEGA_data, AMPL_data, color='green', marker='o', label='données fichier')
+    ax.plot(OME, AMPL, marker='>', label=f'montée en fréquence pour {deltam}')
+    ax.plot(OME2, AMPL2, marker='<', label=f'descente en fréquence pour {deltam}')
     plt.xlabel(r"$\Omega$ pulsation de l'excitation")
     plt.ylabel("Amplitude de la réponse = $max(y(t))$")
     plt.title("Courbe de réponse")

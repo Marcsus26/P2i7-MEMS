@@ -13,13 +13,13 @@ T, Vdc, Vac, omega0, M, C, K = nk.init_params()
 nb_pts_per, nb_per = 50, 500
 fig,ax = plt.subplots(1,1,figsize=(10,4))
 
-OME, AMPL, i_max = nk.compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGA, nb_pts_per, nb_per)
+OME, AMPL = nk.compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGA, nb_pts_per, nb_per)
 
-val1 = OME[i_max]
+
 
     
 # Descente en fréquence
-OME2, AMPL2, i_max = nk.compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_fin, OMEGA_debut, -dOMEGA, nb_pts_per, nb_per)
+OME2, AMPL2 = nk.compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_fin, OMEGA_debut, -dOMEGA, nb_pts_per, nb_per)
 
 # Chargement des données de la courbe de réponse
 data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
@@ -31,12 +31,12 @@ deltam = 1e-15
 T, Vdc, Vac, omega0, M, C, K = nk.init_params(deltam)
 nb_pts_per, nb_per = 50, 500
 
-OME, AMPL,i_max = nk.compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGA, nb_pts_per, nb_per)
+OME, AMPL = nk.compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGA, nb_pts_per, nb_per)
 
-val2 = OME[i_max]
+
 
 # Descente en fréquence
-OME2, AMPL2, i_max = nk.compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_fin, OMEGA_debut, -dOMEGA, nb_pts_per, nb_per)
+OME2, AMPL2 = nk.compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_fin, OMEGA_debut, -dOMEGA, nb_pts_per, nb_per)
 
 # Chargement des données de la courbe de réponse
 data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
@@ -46,8 +46,8 @@ OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
 nk.plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,ax,deltam, True)
 
 
-print(val1)
-print(val2)
-print(f"La différence de OMEGA est de : {abs(val1-val2)[0]}")
+# print(val1)
+# print(val2)
+# print(f"La différence de OMEGA est de : {abs(val1-val2)[0]}")
 
 plt.show()
