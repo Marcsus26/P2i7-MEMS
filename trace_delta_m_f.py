@@ -17,7 +17,8 @@ def compute_delta_f(liste_delta_m, OMEGA_debut, OMEGA_fin, dOMEGA, f0):
 
 def tracer_delta_m_f(liste_delta_m):
     liste_delta_f = compute_delta_f(np.array(liste_delta_m), OMEGA_debut, OMEGA_fin, dOMEGA, f0)
+    print(liste_delta_f)
     plt.plot(liste_delta_m, liste_delta_f)
 
-tracer_delta_m_f([1e-13, 1e-14, 1e-15, 1e-16])
+tracer_delta_m_f([1e-13, 1e-14, 1e-15])
 plt.show()
