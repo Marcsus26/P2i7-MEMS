@@ -1,22 +1,24 @@
-# Import des librairies additionnelles
+from numba import njit
 import numpy as np
 from numpy import zeros
 import matplotlib.pyplot as plt
-import time
 
-# Définition des fonctions de calcul
+# Define functions with numba acceleration
+@njit
 def calc_P(T, Vdc, Vac, OMEGA, t):
     return T * Vdc**2 + 2 * T * Vdc * Vac * np.cos(OMEGA * t)
 
+@njit
 def calc_Fnl(T, Vdc, y):
     return -(3 * T * Vdc**2) * y**2 - (4 * T * Vdc**2) * y**3
 
+@njit
 def calc_dFnl(T, Vdc, y):
     dFY = -6 * T * (Vdc**2) * (y + 2 * y**2)
     dFdY = 0
     return dFY, dFdY
 
-# Fonction Newmark
+@njit
 def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
     precNR = 1.e-12
     t = t_init
@@ -51,7 +53,56 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
 
     return tt, Yt, dYt
 
-# Initialisation des paramètres
+@njit
+def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per, tolerance=0.00001):
+    npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1)
+    OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
+    Y0, dY0 = 0.25, 0
+    k, OMEGA = 0, OMEGA_debut
+
+    while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
+        OME[k] = OMEGA
+        periode = 2 * np.pi / OMEGA
+        dt = periode / nb_pts_per
+        NT = nb_per * nb_pts_per
+        tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
+        AMPL[k] = max(Yt[-3 * nb_pts_per:])
+        Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
+        OMEGA += dOMEGAinit
+        k += 1
+    
+    val = -1000
+
+    if dOMEGAinit < 0:
+        i_max = 0
+        for i in range(len(AMPL)):
+            if AMPL[i] > AMPL[i_max]:
+                i_max = i
+        val = OME[i_max]
+
+        npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 + (0.002) / tolerance)
+        OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
+        Y0, dY0 = 0.25, 0
+        k, OMEGA = 0, OMEGA_debut
+
+        while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
+            OME[k] = OMEGA
+            if (val - 0.001) < OME[k] and (val + 0.001) > OME[k]:
+                dOMEGA = -tolerance
+            else:
+                dOMEGA = dOMEGAinit
+            periode = 2 * np.pi / OMEGA
+            dt = periode / nb_pts_per
+            NT = nb_per * nb_pts_per
+            tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
+            AMPL[k] = max(Yt[-3 * nb_pts_per:])
+            Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
+            OMEGA += dOMEGA
+            k += 1
+
+    return OME[:k], AMPL[:k]
+
+@njit
 def init_params(deltam=0):
     rho, l, b, h, d = 2500, 250e-6, 40e-6, 1e-6, 0.03e-6
     Vdc, Vac = 5, 5 / 10
@@ -67,90 +118,3 @@ def init_params(deltam=0):
     C = xi
     K = 1 - 2 * T * Vdc**2
     return T, Vdc, Vac, omega0, M, C, K
-
-# Calcul de la courbe de réponse
-def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per, tolerance=0.00001):
-    npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1)
-    OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
-    Y0, dY0 = 0.25, 0
-    k, OMEGA = 0, OMEGA_debut
-
-    while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
-        OME[k] = OMEGA
-        periode = 2 * np.pi / OMEGA
-        dt = periode / nb_pts_per
-        NT = nb_per * nb_pts_per
-        tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
-        AMPL[k] = max(Yt[-3 * nb_pts_per:])
-        #print(f'ome= {OME[k, 0]:0.5f}  y= {AMPL[k, 0]:0.5g}', end="\r", flush=True)
-        Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
-        OMEGA += dOMEGAinit
-        k += 1
-    
-    val = -1000
-
-    if dOMEGAinit < 0:
-        i_max = 0
-        for i in range(len(AMPL)):
-            if AMPL[i]>AMPL[i_max]:
-                i_max = i
-        val = OME[i_max]
-        #print(f"val = {val}")
-
-        npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 +(0.002)/tolerance)
-        OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
-        Y0, dY0 = 0.25, 0
-        k, OMEGA = 0, OMEGA_debut
-
-        while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
-            OME[k] = OMEGA
-            if (val-0.001) < OME[k] and  (val+0.001) > OME[k]:
-                dOMEGA = -tolerance
-            else :
-                dOMEGA = dOMEGAinit
-            periode = 2 * np.pi / OMEGA
-            dt = periode / nb_pts_per
-            NT = nb_per * nb_pts_per
-            tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
-            AMPL[k] = max(Yt[-3 * nb_pts_per:])
-            #print(f'ome= {OME[k, 0]:0.5f}  y= {AMPL[k, 0]:0.5g}', end="\r", flush=True)
-            Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
-            OMEGA += dOMEGA
-            k += 1
-
-    print("fin")
-    return OME[:k], AMPL[:k]
-
-# Affichage des résultats
-def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False):
-    if tracer_data:
-        ax.plot(OMEGA_data, AMPL_data, color='green', marker='o', label='données fichier')
-    ax.plot(OME, AMPL, marker='>', label=f'montée en fréquence pour {deltam}')
-    ax.plot(OME2, AMPL2, marker='<', label=f'descente en fréquence pour {deltam}')
-    plt.xlabel(r"$\Omega$ pulsation de l'excitation")
-    plt.ylabel("Amplitude de la réponse = $max(y(t))$")
-    plt.title("Courbe de réponse")
-    plt.legend()
-    plt.xlim(0.988,0.996)
-    plt.grid(color='gray', linestyle='--', linewidth=0.5)
-
-
-# # Main
-# if __name__ == "__main__":
-#     T, Vdc, Vac, omega0, M, C, K = init_params()
-#     OMEGA_debut, OMEGA_fin, dOMEGA = 0.9, 1.10, 0.005
-#     nb_pts_per, nb_per = 50, 500
-
-#     OME, AMPL,i_max = compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGA, nb_pts_per, nb_per)
-
-#     # Descente en fréquence
-#     OME2, AMPL2,i_max = compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_fin, OMEGA_debut, -dOMEGA, nb_pts_per, nb_per)
-
-#     # Chargement des données de la courbe de réponse
-#     data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
-#     OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
-
-#     # Affichage
-#     plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data,tracer_data=True)
-
-#     plt.show()
