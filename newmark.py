@@ -36,7 +36,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
         Y += dt * dY + (dt**2 / 2) * ddY
         dY += dt * ddY
         res = calc_P(T, Vdc, Vac, OMEGA, t) - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
-        normres = abs(res / P)
+        normres = np.abs(res / P)  # Use numpy.abs for array compatibility
 
         while normres > precNR:
             iter += 1
@@ -47,7 +47,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
             dY += (2 / dt) * deltaY
             ddY += (4 / dt**2) * deltaY
             res = calc_P(T, Vdc, Vac, OMEGA, t) - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
-            normres = abs(deltaY / Y)
+            normres = np.abs(deltaY / Y)
 
         tt[n], Yt[n], dYt[n] = t, Y, dY
 
@@ -57,7 +57,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
 def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per, tolerance=0.00001):
     npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1)
     OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
-    Y0, dY0 = 0.25, 0
+    Y0, dY0 = 0.25, 0.25
     k, OMEGA = 0, OMEGA_debut
 
     while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
