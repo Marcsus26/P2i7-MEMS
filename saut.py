@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # Initialize parameters
 T, Vdc, Vac, omega0, M, C, K = nk.init_params()
 
-OMEGA = 0.9913
+OMEGA = 0.9923
 periode = 2 * np.pi / OMEGA  # Period of excitation and response
 nb_pts_per = 60             # Number of points per period for time integration
 dt = periode / nb_pts_per   # Time step size
@@ -39,7 +39,7 @@ print(f"Amplitude of the periodic solution: {amplitude_periodic_solution}")
 # Add a small mass and continue integration
 
 # Update parameters with the added mass
-T, Vdc, Vac, omega0, M_new, C, K = nk.init_params(1e-13)
+T, Vdc, Vac, omega0, M_new, C, K = nk.init_params(1e-17)
 
 # Use final conditions from the previous integration as initial conditions
 Y0_new = Yt[-1]
@@ -62,7 +62,6 @@ print(f"Amplitude of the periodic solution: {amplitude_periodic_solution}")
 # plt.grid()
 # plt.show()
 
-deltam = 1e-13
 T, Vdc, Vac, omega0, M_new, C, K = nk.init_params()
 Y0_new2 = Yt_new[-1]
 dY0_new2 = dYt_new[-1]
@@ -82,8 +81,7 @@ print(f"Amplitude of the periodic solution: {amplitude_periodic_solution}")
 # plt.legend()
 # plt.grid()
 # plt.show()
-
-T, Vdc, Vac, omega0, M_new, C, K = nk.init_params(1e-14)
+T, Vdc, Vac, omega0, M_new, C, K = nk.init_params()
 Y0_new3 = Yt_new2[-1]
 dY0_new3 = dYt_new2[-1]
 

@@ -49,13 +49,16 @@ def courbe_reponse_delta_m(OMEGA_debut, OMEGA_fin, dOMEGA, deltam=0, montee=Fals
 def affichage_courbe_rep():
     Omega_max, OME, AMPL, OME2, AMPL2 = courbe_reponse_delta_m(0.985, 1, 0.0003, 0, True)
     Omega_max, OME13, AMPL13, OME213, AMPL213 = courbe_reponse_delta_m(0.985, 1, 0.0003, 1e-13, True)
+    Omega_max, OME14, AMPL14, OME214, AMPL214 = courbe_reponse_delta_m(0.985, 1, 0.0003, 1e-14, True)
     data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
     OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
     fig,ax = plt.subplots(1,1,figsize=(10,4))
     ax.plot(OME, AMPL, label='Montee')
     ax.plot(OME2, AMPL2, label='Descente')
-    ax.plot(OME13, AMPL13, label='Montee avec deltam=1e-13')
-    ax.plot(OME213, AMPL213, label='Descente avec deltam=1e-13')
+    # ax.plot(OME13, AMPL13, label='Montee avec deltam=1e-13')
+    # ax.plot(OME213, AMPL213, label='Descente avec deltam=1e-13')
+    ax.plot(OME14, AMPL14, label='Montee avec deltam=1e-14')
+    ax.plot(OME214, AMPL214, label='Descente avec deltam=1e-14')
     ax.plot(OMEGA_data, AMPL_data, label='Données expérimentales', linestyle='--')
     ax.legend()
     ax.set_xlabel('OMEGA')

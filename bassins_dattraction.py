@@ -2,9 +2,9 @@ import newmark as nk
 import numpy as np
 import matplotlib.pyplot as plt
 
-T, Vdc, Vac, omega0, M, C, K = nk.init_params()
+T, Vdc, Vac, omega0, M, C, K = nk.init_params(1e-13)
 
-OMEGA = 0.9925
+OMEGA = 0.99
 periode = 2 * np.pi / OMEGA  # periode de l'eYcitation et de la reponse
 nb_pts_per = 60             # nb de points par periode pour l integration temporelle
 dt = periode / nb_pts_per   # taille du pas de temps
