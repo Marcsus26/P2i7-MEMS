@@ -68,5 +68,5 @@ def affichage_courbe_rep():
 
 
 
-affichage_courbe_rep()
-plt.show()
+# affichage_courbe_rep()
+# plt.show()
