@@ -12,7 +12,9 @@ def compute_delta_f(liste_delta_m, OMEGA_debut, OMEGA_fin, dOMEGA, f0):
     for i in prange(len(liste_delta_m)):
         masse = liste_delta_m[i]
         OMEGA = nkm.courbe_reponse_delta_m(OMEGA_debut, OMEGA_fin, dOMEGA, masse)
-        liste_delta_f[i] = f0 * np.abs(OMEGA - OMEGA_ref)[0]
+        A = OMEGA[0]
+        B = OMEGA_ref[0]
+        liste_delta_f[i] = f0 * np.abs((A - B)[0])
     return liste_delta_f
 
 def tracer_delta_m_f(liste_delta_m):
@@ -20,5 +22,10 @@ def tracer_delta_m_f(liste_delta_m):
     print(liste_delta_f)
     plt.plot(liste_delta_m, liste_delta_f)
 
-tracer_delta_m_f([1e-13, 1e-14, 1e-15])
+tracer_delta_m_f(np.logspace(-13, -15, 100, base=10))
+plt.xscale('log')
+plt.xlabel('Masse ajoutée (kg)')
+plt.ylabel('Delta f (Hz)')
+plt.title('Variation de la fréquence de résonance en fonction de la masse ajoutée')
+plt.grid()
 plt.show()
