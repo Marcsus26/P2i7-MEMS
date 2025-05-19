@@ -39,7 +39,7 @@ print(f"Amplitude of the periodic solution: {amplitude_periodic_solution}")
 # Add a small mass and continue integration
 
 # Update parameters with the added mass
-T, Vdc, Vac, omega0, M_new, C, K = nk.init_params(1e-17)
+T, Vdc, Vac, omega0, M_new, C, K = nk.init_params(1e-13)
 
 # Use final conditions from the previous integration as initial conditions
 Y0_new = Yt[-1]
