@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 T, Vdc, Vac, omega0, M, C, K = nk.init_params(1e-13)
 
 OMEGA = 0.99
-periode = 2 * np.pi / OMEGA  # periode de l'eYcitation et de la reponse
+periode = 2 * np.pi / OMEGA  # periode de l'excitation et de la reponse
 nb_pts_per = 60             # nb de points par periode pour l integration temporelle
 dt = periode / nb_pts_per   # taille du pas de temps
 nb_per = 2500               # nb de periodes pour le calcul temporel
