@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def saut_amp(T, Vdc, Vac, omega0, M, C, K, l_masses):
-    OMEGA = 0.9928
+    OMEGA = 0.9933
     periode = 2 * np.pi / OMEGA  # Period of excitation and response
     nb_pts_per = 60             # Number of points per period for time integration
     dt = periode / nb_pts_per   # Time step size
@@ -18,8 +18,11 @@ def saut_amp(T, Vdc, Vac, omega0, M, C, K, l_masses):
     dY0 = 0.3  # Initial velocity
     fig,ax = plt.subplots(figsize = (16,9))
 
-    for i in range (len(l_masses)):
-        OMEGA +=0.0005
+    for i in range(len(l_masses)):
+        if l_masses[i] >= 1e-14:
+            OMEGA = 0.9933 +  (0.0005*np.log10(l_masses[i]/1e-14)) # Frequency of excitation
+        else:
+            OMEGA = 0.9933 +  (0.0005*np.log10(1e-14/l_masses[i]))
         for omega in range(-50, 50, 1):
             tt, Yt, dYt = nk.Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA+(omega*1e-3), M0, C, K)
             if np.max(Yt[-3 * nb_pts_per:]) < 0.2:
@@ -43,5 +46,6 @@ def saut_amp(T, Vdc, Vac, omega0, M, C, K, l_masses):
 
 # Initialize parameters
 T, Vdc, Vac, omega0, M, C, K = nk.init_params()
-liste_masse = [1e-14, 1e-15, 1e-16, 1e-17, 1e-18, 1e-19, 1e-20, 1e-21, 1e-22, 1e-23, 1e-24, 1e-25]
+# liste_masse = [1e-14, 1e-15, 1e-16, 1e-17, 1e-18, 1e-19, 1e-20, 1e-21, 1e-22, 1e-23, 1e-24, 1e-25]
+liste_masse = [1e-25, 1e-14]
 saut_amp(T, Vdc, Vac, omega0, M, C, K, liste_masse)
