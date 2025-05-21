@@ -11,7 +11,7 @@ def saut_amp(T, Vdc, Vac, omega0, M, C, K, l_masses):
     T_bal = 2 * np.pi / OMEGA_bal  # Period of excitation and response
     nb_pts_per = 60             # Number of points per period for time integration
     dt = T_bal / nb_pts_per   # Time step size
-    nb_per = 50000          # Number of periods for time integration
+    nb_per = 5          # Number of periods for time integration
     t_tot = nb_per * T_bal   # Final time
     t_init = 0                  # Initial time
     NT = nb_per * nb_pts_per
