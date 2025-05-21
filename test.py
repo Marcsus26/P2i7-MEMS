@@ -64,9 +64,20 @@ def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, delta
 
 
 OMEGA = 0.9915
-t = np.linspace(0,1,100)
+omega0 = 100e6
+periode = 2 * np.pi / (2*np.pi*50/omega0)  # Period of excitation and response
+nb_pts_per = 10        # Number of points per period for time integration
+dt = periode / nb_pts_per
+nb_per = 200        # Number of periods for time integration
+t_tot = nb_per * periode  
+t = np.zeros(nb_per*nb_pts_per)
+t[0] = 0
+temps=0
+for i in range(len(t)):
+    temps+=dt
+    t[i] = temps 
 OMEGA_c = (0.993 + 0.99)/2
 delta_OMEGA = (0.993 - 0.99)/2
-theta = OMEGA_c*t + ((delta_OMEGA)/(2*np.pi*50))*np.cos((2*np.pi*50)*t)
-print(OMEGA*t)
-print(theta)
+theta = OMEGA_c*t + ((delta_OMEGA)/(2*np.pi*50/omega0))*np.cos((2*np.pi*50/omega0)*t)
+print(np.cos(OMEGA*t))
+print(np.cos(theta))

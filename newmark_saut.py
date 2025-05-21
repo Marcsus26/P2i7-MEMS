@@ -4,24 +4,24 @@ from numpy import zeros
 import matplotlib.pyplot as plt
 
 # Define functions with numba acceleration
-@njit
+@njit(fastmath=True)
 def calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal):
     OMEGA_c = (OMEGA_max + OMEGA_min)/2
     delta_OMEGA = (OMEGA_max - OMEGA_min)/2
     theta = OMEGA_c*t + (delta_OMEGA/OMEGA_bal)*np.cos(OMEGA_bal*t)
     return T * Vdc**2 + 2 * T * Vdc * Vac * np.cos(theta)
 
-@njit
+@njit(fastmath=True)
 def calc_Fnl(T, Vdc, y):
     return -(3 * T * Vdc**2) * y**2 - (4 * T * Vdc**2) * y**3
 
-@njit
+@njit(fastmath=True)
 def calc_dFnl(T, Vdc, y):
     dFY = -6 * T * (Vdc**2) * (y + 2 * y**2)
     dFdY = 0
     return dFY, dFdY
 
-@njit
+@njit(fastmath=True)
 def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, M, C, K, OMEGA_bal):
     precNR = 1.e-12
     t = t_init
@@ -31,10 +31,12 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
 
     tt[0], Yt[0], dYt[0] = t, Y, dY
 
+    P = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
+    ddY = (P - C * dY - K * Y - Fnl) / M
     for n in range(1, NT):
+        t += dt
         P = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
         ddY = (P - C * dY - K * Y - Fnl) / M
-        t += dt
         iter = 0
         Y += dt * dY + (dt**2 / 2) * ddY
         dY += dt * ddY
@@ -56,7 +58,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
 
     return tt, Yt, dYt
 
-@njit
+@njit(fastmath=True)
 def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per, OMEGA_bal, tolerance=0.00001):
     npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1)
     OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
@@ -105,7 +107,7 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
 
     return OME[:k], AMPL[:k]
 
-@njit
+@njit(fastmath=True)
 def init_params(deltam=0):
     rho, l, b, h, d = 2500, 250e-6, 40e-6, 1e-6, 0.03e-6
     Vdc, Vac = 5, 5 / 10
@@ -120,6 +122,6 @@ def init_params(deltam=0):
     M = 1 + (deltam / m)
     C = xi
     K = 1 - 2 * T * Vdc**2
-    OMEGA_bal = 2*np.pi*50
+    OMEGA_bal = (2*np.pi*50)/omega0
     return T, Vdc, Vac, omega0, M, C, K, OMEGA_bal
 
