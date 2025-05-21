@@ -4,7 +4,7 @@ T, Vdc, Vac, omega0, M, C, K, OMEGA_bal = init_params()
 
 # Initialize parameters
 
-periode = 1 / OMEGA_bal  # Period of excitation and response
+periode = 2*np.pi / OMEGA_bal  # Period of excitation and response
 nb_pts_per = 100      # Number of points per period for time integration
 dt = periode / nb_pts_per   # Time step size
 nb_per = 50      # Number of periods for time integration
