@@ -1,6 +1,7 @@
 import newmark as nk
 import newmark_masse_ajoutee as nkm
 import numpy as np
+import newmark_saut as nks
 import matplotlib.pyplot as plt
 
 
@@ -61,3 +62,11 @@ def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, delta
 
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
+
+OMEGA = 0.9915
+t = np.linspace(0,1,100)
+OMEGA_c = (0.993 + 0.99)/2
+delta_OMEGA = (0.993 - 0.99)/2
+theta = OMEGA_c*t + ((delta_OMEGA)/(2*np.pi*50))*np.cos((2*np.pi*50)*t)
+print(OMEGA*t)
+print(theta)
