@@ -22,7 +22,7 @@ def calc_dFnl(T, Vdc, y):
     return dFY, dFdY
 
 @njit
-def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K, OMEGA_bal):
+def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, M, C, K, OMEGA_bal):
     precNR = 1.e-12
     t = t_init
     Y, dY = Y0, dY0
@@ -32,7 +32,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K, OMEGA_
     tt[0], Yt[0], dYt[0] = t, Y, dY
 
     for n in range(1, NT):
-        P = calc_P(T, Vdc, Vac, 0.99, 0.993, t, OMEGA_bal)
+        P = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
         ddY = (P - C * dY - K * Y - Fnl) / M
         t += dt
         iter = 0
