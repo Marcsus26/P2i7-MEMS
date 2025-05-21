@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal):
     OMEGA_c = (OMEGA_max + OMEGA_min)/2
     delta_OMEGA = (OMEGA_max - OMEGA_min)/2
-    theta = OMEGA_c + (delta_OMEGA/OMEGA_bal)*np.cos(OMEGA_bal*t)
+    theta = OMEGA_c*t + (delta_OMEGA/OMEGA_bal)*np.cos(OMEGA_bal*t)
     return T * Vdc**2 + 2 * T * Vdc * Vac * np.cos(theta)
 
 @njit

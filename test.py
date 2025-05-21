@@ -61,11 +61,3 @@ def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, delta
 
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
-
-OMEGA_debut, OMEGA_fin, dOMEGA = 0.985, 1, 0.0001
-deltam = 1e-13
-OMEGA_MAX, OME, AMPL, OME2, AMPL2 = nkm.courbe_reponse_delta_m(OMEGA_debut, OMEGA_fin, dOMEGA, deltam, True)
-data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
-OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
-plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, plt.gca(), deltam, True)
-plt.show()
