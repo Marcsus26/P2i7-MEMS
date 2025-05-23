@@ -35,10 +35,13 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
     
     for n in range(1, NT):
         t += dt
+        P = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
+        Fnl = calc_Fnl(T, Vdc, Y)
+        ddY = (P - C * dY - K * Y - Fnl) / M
         iter = 0
         Y += dt * dY + (dt**2 / 2) * ddY
         dY += dt * ddY
-        res = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal) - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
+        res = P - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
         normres = np.abs(res / P)  # Use numpy.abs for array compatibility
 
         while normres > precNR:
@@ -49,7 +52,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
             Y += deltaY
             dY += (2 / dt) * deltaY
             ddY += (4 / dt**2) * deltaY
-            res = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal) - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
+            res = P - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
             normres = np.abs(deltaY / Y)
 
         tt[n], Yt[n], dYt[n] = t, Y, dY

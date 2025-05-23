@@ -63,7 +63,7 @@ def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, delta
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
 T, Vdc, Vac, omega0, M, C, K = nk.init_params()
-OMEGA = 0.9915
+OMEGA = 1
 periode = 2*np.pi / OMEGA  # Period of excitation and response
 nb_pts_per = 100      # Number of points per period for time integration
 dt = periode / nb_pts_per   # Time step size
