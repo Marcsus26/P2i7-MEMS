@@ -5,14 +5,14 @@ T, Vdc, Vac, omega0, M, C, K, OMEGA_bal = init_params()
 # Initialize parameters
 
 periode = 2*np.pi / OMEGA_bal  # Period of excitation and response
-nb_pts_per = 1000      # Number of points per period for time integration
+nb_pts_per = 5000     # Number of points per period for time integration
 dt = periode / nb_pts_per   # Time step size
-nb_per = 1    # Number of periods for time integration
+nb_per = 5    # Number of periods for time integration
 t_tot = nb_per * periode    # Final time
 t_init = 0                  # Initial time
 NT = nb_per * nb_pts_per
 
-tt, Yt, dYt = Newmark(0.3, 0.3, t_init, dt, NT, omega0, T, Vdc, Vac, 0.99, 0.993, M, C, K, OMEGA_bal)
+tt, Yt, dYt = Newmark(0, 0, t_init, dt, NT, omega0, T, Vdc, Vac, 0.99, 0.993, M, C, K, OMEGA_bal)
 
 # Plot the displacement over time
 plt.figure(figsize=(50, 6))

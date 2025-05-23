@@ -27,12 +27,12 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
     t = t_init
     Y, dY = Y0, dY0
     tt, Yt, dYt = zeros((NT, 1)), zeros((NT, 1)), zeros((NT, 1))
+    P = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
     Fnl = calc_Fnl(T, Vdc, Y)
+    ddY = (P - C * dY - K * Y - Fnl) / M
 
     tt[0], Yt[0], dYt[0] = t, Y, dY
     
-    P = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
-    ddY = (P - C * dY - K * Y - Fnl) / M
     for n in range(1, NT):
         t += dt
         iter = 0
