@@ -4,21 +4,21 @@ from numpy import zeros
 import matplotlib.pyplot as plt
 
 # Define functions with numba acceleration
-@njit
+@njit(fastmath=True)
 def calc_P(T, Vdc, Vac, OMEGA, t):
     return T * Vdc**2 + 2 * T * Vdc * Vac * np.cos(OMEGA * t)
 
-@njit
+@njit(fastmath=True)
 def calc_Fnl(T, Vdc, y):
     return -(3 * T * Vdc**2) * y**2 - (4 * T * Vdc**2) * y**3
 
-@njit
+@njit(fastmath=True)
 def calc_dFnl(T, Vdc, y):
     dFY = -6 * T * (Vdc**2) * (y + 2 * y**2)
     dFdY = 0
     return dFY, dFdY
 
-@njit
+@njit(fastmath=True)
 def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
     precNR = 1.e-12
     t = t_init
@@ -53,7 +53,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
 
     return tt, Yt, dYt
 
-@njit
+@njit(fastmath=True)
 def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per, tolerance=0.00001):
     npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1)
     OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
@@ -102,7 +102,7 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
 
     return OME[:k], AMPL[:k]
 
-@njit
+@njit(fastmath=True)
 def init_params(deltam=0):
     rho, l, b, h, d = 2500, 250e-6, 40e-6, 1e-6, 0.03e-6
     Vdc, Vac = 5, 5 / 10

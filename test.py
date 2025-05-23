@@ -79,5 +79,5 @@ for i in range(len(t)):
 OMEGA_c = (0.993 + 0.99)/2
 delta_OMEGA = (0.993 - 0.99)/2
 theta = OMEGA_c*t + ((delta_OMEGA)/(2*np.pi*50/omega0))*np.cos((2*np.pi*50/omega0)*t)
-print(np.cos(OMEGA*t))
-print(np.cos(theta))
+print(OMEGA*t)
+print(theta)

@@ -30,17 +30,15 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
     Fnl = calc_Fnl(T, Vdc, Y)
 
     tt[0], Yt[0], dYt[0] = t, Y, dY
-
+    
     P = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
     ddY = (P - C * dY - K * Y - Fnl) / M
     for n in range(1, NT):
         t += dt
-        P = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
-        ddY = (P - C * dY - K * Y - Fnl) / M
         iter = 0
         Y += dt * dY + (dt**2 / 2) * ddY
         dY += dt * ddY
-        res = P - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
+        res = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal) - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
         normres = np.abs(res / P)  # Use numpy.abs for array compatibility
 
         while normres > precNR:
@@ -51,61 +49,13 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
             Y += deltaY
             dY += (2 / dt) * deltaY
             ddY += (4 / dt**2) * deltaY
-            res = P - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
+            res = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal) - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
             normres = np.abs(deltaY / Y)
 
         tt[n], Yt[n], dYt[n] = t, Y, dY
 
     return tt, Yt, dYt
 
-@njit(fastmath=True)
-def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per, OMEGA_bal, tolerance=0.00001):
-    npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1)
-    OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
-    Y0, dY0 = 0.25, 0.25
-    k, OMEGA = 0, OMEGA_debut
-
-    while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
-        OME[k] = OMEGA
-        periode = 2 * np.pi / OMEGA
-        dt = periode / nb_pts_per
-        NT = nb_per * nb_pts_per
-        tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K, OMEGA_bal)
-        AMPL[k] = max(Yt[-3 * nb_pts_per:])
-        Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
-        OMEGA += dOMEGAinit
-        k += 1
-    
-    val = -1000
-
-    if dOMEGAinit < 0:
-        i_max = 0
-        for i in range(len(AMPL)):
-            if AMPL[i] > AMPL[i_max]:
-                i_max = i
-        val = OME[i_max]
-
-        npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 + (0.002) / tolerance)
-        OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
-        Y0, dY0 = 0.25, 0
-        k, OMEGA = 0, OMEGA_debut
-
-        while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
-            OME[k] = OMEGA
-            if (val - 0.001) < OME[k] and (val + 0.001) > OME[k]:
-                dOMEGA = -tolerance
-            else:
-                dOMEGA = dOMEGAinit
-            periode = 2 * np.pi / OMEGA
-            dt = periode / nb_pts_per
-            NT = nb_per * nb_pts_per
-            tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K, OMEGA_bal)
-            AMPL[k] = max(Yt[-3 * nb_pts_per:])
-            Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
-            OMEGA += dOMEGA
-            k += 1
-
-    return OME[:k], AMPL[:k]
 
 @njit(fastmath=True)
 def init_params(deltam=0):
