@@ -15,6 +15,7 @@ nb_per = 2500    # Number of periods for time integration
 t_tot = nb_per * periode    # Final time
 t_init = 0                  # Initial time
 NT = nb_per * nb_pts_per
+print(dt)
 
 tt, Yt, dYt  = nk.Newmark(0.3,0.3,t_init,dt, NT, omega0, T, Vdc, Vac,OMEGA,M,C,K)
 
