@@ -148,3 +148,11 @@ def init_params(deltam=0):
     C = xi
     K = 1 - 2 * T * Vdc**2
     return T, Vdc, Vac, omega0, M, C, K
+
+def recuperer_courbe_data():
+    # Chargement des données de la courbe de réponse
+    OMEGA_data, AMPL_data = 0, 0
+    
+    data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
+    OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
+    return OMEGA_data, AMPL_data
