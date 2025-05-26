@@ -104,32 +104,16 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
 
 def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False):
 
-
-    ax.plot(OME, AMPL, marker='>', label=f'montée en fréquence pour {deltam}')
-
-
-    ax.plot(OME2, AMPL2, marker='<', label=f'descente en fréquence pour {deltam}')
-
     if tracer_data:
-
         ax.plot(OMEGA_data, AMPL_data, color='green', marker='o', label='données fichier')
 
-
     ax.plot(OME, AMPL, marker='>', label=f'montée en fréquence pour {deltam}')
-
-
     ax.plot(OME2, AMPL2, marker='<', label=f'descente en fréquence pour {deltam}')
-
     plt.xlabel(r"$\Omega$ pulsation de l'excitation")
-
     plt.ylabel("Amplitude de la réponse = $max(y(t))$")
-
     plt.title("Courbe de réponse")
-
     plt.legend()
-
     plt.xlim(0.988,0.996)
-
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
 @njit(fastmath=True)
