@@ -42,9 +42,3 @@ def saut_amp(T, Vdc, Vac, omega0, M, C, K, l_masses):
     ax.legend()
     ax.grid()
     plt.show()
-
-# Initialize parameters
-T, Vdc, Vac, omega0, M, C, K, OMEGA_bal = nks.init_params()
-liste_masse = [1e-13,0]
-# liste_masse = [1e-25, 1e-14]
-saut_amp(T, Vdc, Vac, omega0, M, C, K, liste_masse)

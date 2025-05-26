@@ -21,22 +21,9 @@ dY0 = 0.3  # Initial velocity
 # Perform Newmark integration
 tt, Yt, dYt = nk.Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
 
-# # Plot the displacement over time
-# plt.figure(figsize=(10, 6))
-# plt.plot(tt, Yt, label='Displacement (Yt)')
-# plt.xlabel('Time (s)')
-# plt.ylabel('Displacement')
-# plt.title('Displacement Over Time for deltam=0')
-# plt.legend()
-# plt.grid()
 
-
-# Verify the amplitude of the periodic solution
 amplitude_periodic_solution = np.max(Yt[-3 * nb_pts_per:])
 print(f"Amplitude of the periodic solution: {amplitude_periodic_solution}")
-#assert np.isclose(amplitude_periodic_solution, 0.169, atol=0.01), "The amplitude does not match the expected value of 0.169."
-
-# Add a small mass and continue integration
 
 # Update parameters with the added mass
 T, Vdc, Vac, omega0, M_new, C, K = nk.init_params(1e-13)
@@ -51,16 +38,6 @@ tt_new, Yt_new, dYt_new = nk.Newmark(Y0_new, dY0_new, t_tot, dt, NT, omega0, T, 
 amplitude_periodic_solution = np.max(Yt_new[-3 * nb_pts_per:])
 print(f"Amplitude of the periodic solution: {amplitude_periodic_solution}")
 
-# Plot the displacement over time for both integrations
-# plt.figure(figsize=(10, 6))
-# plt.plot(tt, Yt, label='Displacement (Yt) - deltam=0')
-# plt.plot(tt_new, Yt_new, label='Displacement (Yt) - deltam=1e-13', color='orange')
-# plt.xlabel('Time (s)')
-# plt.ylabel('Displacement')
-# plt.title('Displacement Over Time with and without Added Mass')
-# plt.legend()
-# plt.grid()
-# plt.show()
 
 T, Vdc, Vac, omega0, M_new, C, K = nk.init_params()
 Y0_new2 = Yt_new[-1]
@@ -71,16 +48,6 @@ tt_new2, Yt_new2, dYt_new2 = nk.Newmark(Y0_new2, dY0_new2, 2*t_tot, dt, NT, omeg
 amplitude_periodic_solution = np.max(Yt_new2[-3 * nb_pts_per:])
 print(f"Amplitude of the periodic solution: {amplitude_periodic_solution}")
 
-# plt.figure(figsize=(10, 6))
-# plt.plot(tt, Yt, label='Displacement (Yt) - deltam=0')
-# plt.plot(tt_new, Yt_new, label='Displacement (Yt) - deltam=1e-13', color='orange')
-# plt.plot(tt_new2, Yt_new2, label='Displacement (Yt) - deltam=0')
-# plt.xlabel('Time (s)')
-# plt.ylabel('Displacement')
-# plt.title('Displacement Over Time with and without Added Mass')
-# plt.legend()
-# plt.grid()
-# plt.show()
 T, Vdc, Vac, omega0, M_new, C, K = nk.init_params()
 Y0_new3 = Yt_new2[-1]
 dY0_new3 = dYt_new2[-1]
