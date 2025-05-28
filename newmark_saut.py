@@ -138,6 +138,6 @@ def init_params(deltam=0):
     M = 1 + (deltam / m)
     C = xi
     K = 1 - 2 * T * Vdc**2
-    OMEGA_bal = (2*np.pi*1000)/omega0
+    OMEGA_bal = (2*np.pi*500)/omega0
     return T, Vdc, Vac, omega0, M, C, K, OMEGA_bal
 
