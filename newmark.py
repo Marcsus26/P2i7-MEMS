@@ -148,7 +148,6 @@ def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, delta
     plt.legend()
     plt.xlim(0.988,0.996)
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
-
     
 
 @njit(fastmath=True)
