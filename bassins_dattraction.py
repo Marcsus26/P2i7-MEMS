@@ -37,4 +37,3 @@ def Bassin(OMEGA,deltam=0):
     # print('ellapsed time: ',time.process_time() - start)
     plt.show()
 
-Bassin(0.9925,0)
