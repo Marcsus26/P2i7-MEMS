@@ -26,16 +26,15 @@ def Bassin(OMEGA,deltam=0):
     im = ax1.imshow(AMPL, interpolation='none', aspect='auto', extent=[-2, 2, -2, 2], vmin=0, vmax=1, cmap='jet')
     fig1.colorbar(im, ax=ax1)
 
-    plt.ion()  # Turn on interactive mode for live updates
-    plt.show()
-
-    for i in range(len(Y0)):  # boucle sur les CI
-        for j in range(len(dY0)):
-            tt, Yt, dYt = nk.Newmark(Y0[i], dY0[j], t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
-            AMPL[j, i] = np.max(Yt[-2 * nb_pts_per:])
-            im.set_data(AMPL)
+    for i in range(0,len(Y0)):   # boucle sur les CI
+        for j in range(0,len(dY0)):
+            tt,Yt,dYt=nk.Newmark(Y0[i],dY0[j],t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
+            AMPL[j,i]=np.max(Yt[-2*nb_pts_per:])
+        im.set_data(AMPL)
         fig1.canvas.draw()
-        fig1.canvas.flush_events()
 
-    plt.ioff()  # Turn off interactive mode
+
+    # print('ellapsed time: ',time.process_time() - start)
     plt.show()
+
+Bassin(0.9925,0)
