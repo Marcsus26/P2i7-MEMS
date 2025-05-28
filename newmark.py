@@ -102,19 +102,54 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
 
     return OME[:k], AMPL[:k]
 
-def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False):
+def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False, zoom = False):
 
     if tracer_data:
         ax.plot(OMEGA_data, AMPL_data, color='green', marker='o', label='données fichier')
 
+        if zoom : 
+            # Pic des données fichier
+            omega_max_data = OMEGA_data[np.argmax(AMPL_data)]
+            amp_max_data = np.max(AMPL_data)
+
+            # Pic de la courbe de descente
+            omega_max_descente = OME2[np.argmax(AMPL2)][0]
+            amp_max_descente = np.max(AMPL2)
+
+            # Conversion en Hz
+            f_data = omega_max_data / (2 * np.pi)
+            f_descente = omega_max_descente / (2 * np.pi)
+            delta_f = abs(f_data - f_descente)
+
+            # Tracer les points
+            ax.plot(omega_max_data, amp_max_data, 'go', label='max données fichier')
+            ax.plot(omega_max_descente, amp_max_descente, 'ro', label='max descente')
+
+            # Ligne et texte Δf
+            y_level = max(amp_max_data, amp_max_descente) + 0.02
+            ax.hlines(y=y_level,
+                    xmin=omega_max_data,
+                    xmax=omega_max_descente,
+                    color='black',
+                    linestyle='--')
+
+            ax.text((omega_max_data + omega_max_descente) / 2,
+                    y_level + 0.01,
+                    f'Δf = {delta_f:.1f} Hz',
+                    ha='center',
+                    fontsize=10,
+                    bbox=dict(facecolor='white', edgecolor='black', alpha=0.8))
+
     ax.plot(OME, AMPL, marker='>', label=f'montée en fréquence pour {deltam}')
     ax.plot(OME2, AMPL2, marker='<', label=f'descente en fréquence pour {deltam}')
     plt.xlabel(r"$\Omega$ pulsation de l'excitation")
-    plt.ylabel("Amplitude de la réponse = $max(y(t))$")
-    plt.title("Courbe de réponse")
+    plt.ylabel("Amplitude adimensionnée de la réponse = $max(y(t))$")
+    plt.title("Courbe de réponse du résonnateur")
     plt.legend()
     plt.xlim(0.988,0.996)
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
+
+    
 
 @njit(fastmath=True)
 def init_params(deltam=0):
