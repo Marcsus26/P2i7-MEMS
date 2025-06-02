@@ -76,32 +76,32 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
     
     val = -1000
 
-    if dOMEGAinit < 0:
-        i_max = 0
-        for i in range(len(AMPL)):
-            if AMPL[i] > AMPL[i_max]:
-                i_max = i
-        val = OME[i_max]
+    # if dOMEGAinit < 0:
+    #     i_max = 0
+    #     for i in range(len(AMPL)):
+    #         if AMPL[i] > AMPL[i_max]:
+    #             i_max = i
+    #     val = OME[i_max]
 
-        npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 + (0.002) / tolerance)
-        OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
-        Y0, dY0 = 0.25, 0
-        k, OMEGA = 0, OMEGA_debut
+    #     npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 + (0.002) / tolerance)
+    #     OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
+    #     Y0, dY0 = 0.25, 0
+    #     k, OMEGA = 0, OMEGA_debut
 
-        while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
-            OME[k] = OMEGA
-            if (val - 0.001) < OME[k] and (val + 0.001) > OME[k]:
-                dOMEGA = -tolerance
-            else:
-                dOMEGA = dOMEGAinit
-            periode = 2 * np.pi / OMEGA
-            dt = periode / nb_pts_per
-            NT = nb_per * nb_pts_per
-            tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
-            AMPL[k] = max(Yt[-3 * nb_pts_per:])
-            Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
-            OMEGA += dOMEGA
-            k += 1
+    #     while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
+    #         OME[k] = OMEGA
+    #         if (val - 0.001) < OME[k] and (val + 0.001) > OME[k]:
+    #             dOMEGA = -tolerance
+    #         else:
+    #             dOMEGA = dOMEGAinit
+    #         periode = 2 * np.pi / OMEGA
+    #         dt = periode / nb_pts_per
+    #         NT = nb_per * nb_pts_per
+    #         tt, Yt, dYt = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K)
+    #         AMPL[k] = max(Yt[-3 * nb_pts_per:])
+    #         Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
+    #         OMEGA += dOMEGA
+    #         k += 1
 
     return OME[:k], AMPL[:k]
 
@@ -137,10 +137,10 @@ def init_params(deltam=0):
     K = 1 - 2 * T * Vdc**2
     return T, Vdc, Vac, omega0, M, C, K
 
-def recuperer_courbe_data():
+def recuperer_courbe_data(path):
     # Chargement des données de la courbe de réponse
     OMEGA_data, AMPL_data = 0, 0
     
-    data = np.loadtxt('courbe_reponse_modified.txt', delimiter=',')
+    data = np.loadtxt(path, delimiter=',')
     OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
     return OMEGA_data, AMPL_data
