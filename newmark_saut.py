@@ -9,7 +9,8 @@ def calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal):
     OMEGA_c = (OMEGA_max + OMEGA_min)/2
     delta_OMEGA = (OMEGA_max - OMEGA_min)/2
     theta = OMEGA_c*t + (delta_OMEGA/OMEGA_bal)*np.cos(OMEGA_bal*t)
-    return T * Vdc**2 + 2 * T * Vdc * Vac * np.cos(theta), theta
+    dtheta = OMEGA_c - (delta_OMEGA)*(np.sin(OMEGA_bal*t))
+    return T * Vdc**2 + 2 * T * Vdc * Vac * np.cos(theta), dtheta
 
 @njit(fastmath=True)
 def calc_Fnl(T, Vdc, y):
@@ -23,15 +24,15 @@ def calc_dFnl(T, Vdc, y):
 
 @njit(fastmath=True)
 def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, M, C, K, OMEGA_bal):
-    precNR = 1.e-5
+    precNR = 1.e-12
     t = t_init
     Y, dY = Y0, dY0
     tt, Yt, dYt = zeros((NT, 1)), zeros((NT, 1)), zeros((NT, 1))
-    P, theta = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
+    P, dtheta = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
     Fnl = calc_Fnl(T, Vdc, Y)
     ddY = (P - C * dY - K * Y - Fnl) / M
-    l_theta = []
-    l_theta.append(theta)
+    l_dtheta = []
+    l_dtheta.append(dtheta)
 
     tt[0], Yt[0], dYt[0] = t, Y, dY
     
@@ -39,8 +40,8 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
         t += dt
         Y += dt * dY + (dt**2 / 2) * ddY
         dY += dt * ddY
-        P, theta = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
-        l_theta.append(theta)
+        P, dtheta = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
+        l_dtheta.append(dtheta)
         res = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)[0] - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
         normres = np.abs(res / P)  # Use numpy.abs for array compatibility
 
@@ -57,7 +58,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
 
         tt[n], Yt[n], dYt[n] = t, Y, dY
 
-    return tt, Yt, dYt, l_theta
+    return tt, Yt, dYt, l_dtheta
 
 @njit(fastmath=True)
 def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per,OMEGA_bal, tolerance=0.00001):
@@ -79,32 +80,32 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
     
     val = -1000
 
-    if dOMEGAinit < 0:
-        i_max = 0
-        for i in range(len(AMPL)):
-            if AMPL[i] > AMPL[i_max]:
-                i_max = i
-        val = OME[i_max]
+    # if dOMEGAinit < 0:
+    #     i_max = 0
+    #     for i in range(len(AMPL)):
+    #         if AMPL[i] > AMPL[i_max]:
+    #             i_max = i
+    #     val = OME[i_max]
 
-        npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 + (0.002) / tolerance)
-        OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
-        Y0, dY0 = 0.25, 0
-        k, OMEGA = 0, OMEGA_debut
+    #     npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 + (0.002) / tolerance)
+    #     OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
+    #     Y0, dY0 = 0.25, 0
+    #     k, OMEGA = 0, OMEGA_debut
 
-        while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
-            OME[k] = OMEGA
-            if (val - 0.001) < OME[k] and (val + 0.001) > OME[k]:
-                dOMEGA = -tolerance
-            else:
-                dOMEGA = dOMEGAinit
-            periode = 2 * np.pi / OMEGA
-            dt = periode / nb_pts_per
-            NT = nb_per * nb_pts_per
-            tt, Yt, dYt, l_theta = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, OMEGA, M, C, K, OMEGA_bal)
-            AMPL[k] = max(Yt[-3 * nb_pts_per:])
-            Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
-            OMEGA += dOMEGA
-            k += 1
+    #     while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
+    #         OME[k] = OMEGA
+    #         if (val - 0.001) < OME[k] and (val + 0.001) > OME[k]:
+    #             dOMEGA = -tolerance
+    #         else:
+    #             dOMEGA = dOMEGAinit
+    #         periode = 2 * np.pi / OMEGA
+    #         dt = periode / nb_pts_per
+    #         NT = nb_per * nb_pts_per
+    #         tt, Yt, dYt, l_theta = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, OMEGA, M, C, K, OMEGA_bal)
+    #         AMPL[k] = max(Yt[-3 * nb_pts_per:])
+    #         Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
+    #         OMEGA += dOMEGA
+    #         k += 1
 
     return OME[:k], AMPL[:k]
 
@@ -138,6 +139,6 @@ def init_params(deltam=0):
     M = 1 + (deltam / m)
     C = xi
     K = 1 - 2 * T * Vdc**2
-    OMEGA_bal = (2*np.pi*500)/omega0
+    OMEGA_bal = (2*np.pi*1000)/omega0
     return T, Vdc, Vac, omega0, M, C, K, OMEGA_bal
 
