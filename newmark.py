@@ -141,6 +141,6 @@ def recuperer_courbe_data(path):
     # Chargement des données de la courbe de réponse
     OMEGA_data, AMPL_data = 0, 0
     
-    data = np.loadtxt(path, delimiter=',')
+    data = np.loadtxt(path, delimiter=',', skiprows=1)
     OMEGA_data, AMPL_data = data[:, 0], data[:, 1]
     return OMEGA_data, AMPL_data
