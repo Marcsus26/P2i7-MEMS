@@ -2,14 +2,14 @@ import numpy as np
 from newmark import compute_response_curve, init_params
 
 # Plage de masses à tester
-masses = [1e-19,1e-20]  # 1e-12 à 1e-25 inclus
+masses = [1e-13,1e-14,1e-15,1e-16,1e-17,1e-18,1e-19,1e-20,1e-21,1e-22,1e-23,1e-24,1e-25]  # 1e-12 à 1e-25 inclus
 
 # Paramètres de balayage
 OMEGA_debut = 0.97
 OMEGA_fin = 1.0
 pas_OMEGA = 0.00005
-nb_pts_per = 60
-nb_per = 2500
+nb_pts_per = 50
+nb_per = 500
 
 def save_response_curve_for_mass(mass):
     T, Vdc, Vac, omega0, M, C, K = init_params(mass)
