@@ -2,7 +2,7 @@ import newmark as nk
 import numpy as np
 import matplotlib.pyplot as plt
 
-T, Vdc, Vac, omega0, M, C, K = nk.init_params(1e-13)
+T, Vdc, Vac, omega0, M, C, K, d = nk.init_params(1e-13)
 
 OMEGA = 0.99
 periode = 2 * np.pi / OMEGA  # periode de l'excitation et de la reponse

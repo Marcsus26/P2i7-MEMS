@@ -9,7 +9,7 @@ from numba import njit
 
 @njit(fastmath=True)
 def courbe_reponse_delta_m(OMEGA_debut, OMEGA_fin, dOMEGA, deltam=0, montee=False, data = False):
-    T, Vdc, Vac, omega0, M, C, K = nk.init_params(deltam)
+    T, Vdc, Vac, omega0, M, C, K, d = nk.init_params(deltam)
     nb_pts_per, nb_per = 50, 500
     if montee:
         OME, AMPL = nk.compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGA, nb_pts_per, nb_per)
@@ -19,3 +19,4 @@ def courbe_reponse_delta_m(OMEGA_debut, OMEGA_fin, dOMEGA, deltam=0, montee=Fals
 
     OMEGA_MAX = OME2[np.argmax(AMPL2)]
     return OMEGA_MAX, OME, AMPL, OME2, AMPL2
+

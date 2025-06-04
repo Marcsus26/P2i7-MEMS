@@ -12,7 +12,7 @@ nb_pts_per = 50
 nb_per = 500
 
 def save_response_curve_for_mass(mass):
-    T, Vdc, Vac, omega0, M, C, K = init_params(mass)
+    T, Vdc, Vac, omega0, M, C, K, d = init_params(mass)
     # Montée en fréquence
     OME_up, AMPL_up = compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, pas_OMEGA, nb_pts_per, nb_per)
     fname_up = f"Courbes de réponse/courbe_reponse_masse_{mass:.0e}_up.txt"

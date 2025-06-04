@@ -135,7 +135,7 @@ def init_params(deltam=0):
     M = 1 + (deltam / m)
     C = xi
     K = 1 - 2 * T * Vdc**2
-    return T, Vdc, Vac, omega0, M, C, K
+    return T, Vdc, Vac, omega0, M, C, K, d
 
 def recuperer_courbe_data(path):
     # Chargement des données de la courbe de réponse
