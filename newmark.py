@@ -108,7 +108,7 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
 def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False, zoom = False):
 
     if tracer_data:
-        ax.plot(OMEGA_data, AMPL_data, color='green', marker='o', label='données fichier')
+        ax.plot(OMEGA_data, AMPL_data, color='green', marker='o', label='Courbe de référence')
 
     ax.plot(OME, AMPL, marker='>', label=f'montée en fréquence pour {deltam}')
     ax.plot(OME2, AMPL2, marker='<', label=f'descente en fréquence pour {deltam}')
