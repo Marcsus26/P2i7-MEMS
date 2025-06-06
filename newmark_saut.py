@@ -3,6 +3,7 @@ import numpy as np
 from numpy import zeros
 import matplotlib.pyplot as plt
 
+# Calcule l'excitation extérieure p(t) et la dérivée de phase pour le balayage
 @njit(fastmath=True)
 def calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal):
     OMEGA_c = (OMEGA_max + OMEGA_min)/2
@@ -11,16 +12,19 @@ def calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal):
     dtheta = OMEGA_c - (delta_OMEGA)*(np.sin(OMEGA_bal*t))
     return T * Vdc**2 + 2 * T * Vdc * Vac * np.cos(theta), dtheta
 
+# Calcule la force non linéaire interne
 @njit(fastmath=True)
 def calc_Fnl(T, Vdc, y):
     return -(3 * T * Vdc**2) * y**2 - (4 * T * Vdc**2) * y**3
 
+# Calcule la dérivée de la force non linéaire pour Newton-Raphson
 @njit(fastmath=True)
 def calc_dFnl(T, Vdc, y):
     dFY = -6 * T * (Vdc**2) * (y + 2 * y**2)
     dFdY = 0
     return dFY, dFdY
 
+# Schéma de Newmark adapté au balayage de fréquence (OMEGA variable)
 @njit(fastmath=True)
 def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, M, C, K, OMEGA_bal):
     precNR = 1.e-12
@@ -32,10 +36,10 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
     ddY = (P - C * dY - K * Y - Fnl) / M
     l_dtheta = []
     l_dtheta.append(dtheta)
-
     tt[0], Yt[0], dYt[0] = t, Y, dY
     
     for n in range(1, NT):
+        # Intégration temporelle avec correction Newton-Raphson
         t += dt
         Y += dt * dY + (dt**2 / 2) * ddY
         dY += dt * ddY
@@ -58,6 +62,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
 
     return tt, Yt, dYt, l_dtheta
 
+# Calcule la courbe de réponse pour un balayage de la pulsation d'excitation
 @njit(fastmath=True)
 def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per,OMEGA_bal, tolerance=0.00001):
     npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1)
@@ -80,6 +85,9 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
     
     return OME[:k], AMPL[:k]
 
+# Trace la courbe de réponse sur un axe matplotlib
+# Peut afficher la courbe de référence
+
 def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False):
 
     if tracer_data:
@@ -95,6 +103,7 @@ def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, delta
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
 
+# Initialise les paramètres physiques et adimensionnés du système pour le cas avec balayage
 @njit(fastmath=True)
 def init_params(deltam=0):
     rho, l, b, h, d = 2500, 250e-6, 40e-6, 1e-6, 0.03e-6

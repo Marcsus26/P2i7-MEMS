@@ -6,20 +6,24 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from matplotlib.patches import ConnectionPatch
 
+# Calcule l'excitation extérieure p(t) pour le système MEMS
 @njit(fastmath=True)
 def calc_P(T, Vdc, Vac, OMEGA, t):
     return T * Vdc**2 + 2 * T * Vdc * Vac * np.cos(OMEGA * t)
 
+# Calcule la force non linéaire interne
 @njit(fastmath=True)
 def calc_Fnl(T, Vdc, y):
     return -(3 * T * Vdc**2) * y**2 - (4 * T * Vdc**2) * y**3
 
+# Calcule la dérivée de la force non linéaire pour le schéma de Newton-Raphson
 @njit(fastmath=True)
 def calc_dFnl(T, Vdc, y):
     dFY = -6 * T * (Vdc**2) * (y + 2 * y**2)
     dFdY = 0
     return dFY, dFdY
 
+# Schéma d'intégration de Newmark pour résoudre l'équation du mouvement du MEMS
 @njit(fastmath=True)
 def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
     precNR = 1.e-12
@@ -33,6 +37,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
     tt[0], Yt[0], dYt[0] = t, Y, dY
 
     for n in range(1, NT):
+        # Intégration temporelle avec correction Newton-Raphson
         t += dt
         iter = 0
         Y += dt * dY + (dt**2 / 2) * ddY
@@ -55,6 +60,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA, M, C, K):
 
     return tt, Yt, dYt
 
+# Calcule la courbe de réponse (amplitude en régime permanent vs pulsation d'excitation)
 @njit(fastmath=True)
 def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin, dOMEGAinit, nb_pts_per, nb_per, tolerance=0.00001):
     npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1)
@@ -77,6 +83,9 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
 
     return OME[:k], AMPL[:k]
 
+# Trace la courbe de réponse sur un axe matplotlib
+# Peut afficher la courbe de référence et zoomer sur la zone d'intérêt
+
 def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False, zoom = False):
 
     if tracer_data:
@@ -92,6 +101,7 @@ def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, delta
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
     
 
+# Initialise les paramètres physiques et adimensionnés du système
 @njit(fastmath=True)
 def init_params(deltam=0):
     rho, l, b, h, d = 2500, 250e-6, 40e-6, 1e-6, 0.03e-6
@@ -108,6 +118,8 @@ def init_params(deltam=0):
     C = xi
     K = 1 - 2 * T * Vdc**2
     return T, Vdc, Vac, omega0, M, C, K, d
+
+# Charge une courbe de réponse depuis un fichier texte
 
 def recuperer_courbe_data(path):
     # Chargement des données de la courbe de réponse

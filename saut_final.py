@@ -3,14 +3,15 @@ import numpy as np
 import newmark as nk
 from numba import prange, njit
 
-
+# Fonction pour simuler le saut d'amplitude lors d'un balayage de la pulsation
 @njit
 def saut_ampl(T, Vdc, Vac, omega0, M, C, K, OMEGA_bal, OMEGA_min, OMEGA_max, nb_pts_per, dt, nb_per, t_init, NT, nb_newmark, delta_m):
-    Y0 = np.array([0.0])
-    dY0 = np.array([0.0])
-    liste_dtheta = np.zeros((nb_per*nb_pts_per*nb_newmark, 1))
-    liste_Yt = np.zeros((nb_per*nb_pts_per*nb_newmark, 1))
+    Y0 = np.array([0.0])  # Condition initiale déplacement
+    dY0 = np.array([0.0]) # Condition initiale vitesse
+    liste_dtheta = np.zeros((nb_per*nb_pts_per*nb_newmark, 1))  # Stocke l'évolution de la pulsation
+    liste_Yt = np.zeros((nb_per*nb_pts_per*nb_newmark, 1))      # Stocke l'évolution du déplacement
 
+    # Première phase : sans masse ajoutée
     for i in range(nb_newmark):
         tt, Yt, dYt, dtheta = Newmark(Y0[0], dY0[0], t_init[0], dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, M, C, K, OMEGA_bal)
         t_init = tt[-1]
@@ -21,6 +22,7 @@ def saut_ampl(T, Vdc, Vac, omega0, M, C, K, OMEGA_bal, OMEGA_min, OMEGA_max, nb_
             liste_Yt[j+i*(len(Yt)),0] = Yt[j,0]
 
 
+    # Mise à jour des conditions initiales et paramètres pour la phase avec masse ajoutée
     t_init = tt[-1]
     Y0 = Yt[-1]
     dY0 = dYt[-1]
@@ -29,6 +31,7 @@ def saut_ampl(T, Vdc, Vac, omega0, M, C, K, OMEGA_bal, OMEGA_min, OMEGA_max, nb_
     liste_dtheta_new = np.zeros((nb_per*nb_pts_per*nb_newmark*2,1))
     liste_Yt_new = np.zeros((nb_per*nb_pts_per*nb_newmark*2,1))
 
+    # Deuxième phase : avec masse ajoutée
     for i in range(nb_newmark*2):
         tt_new, Yt_new, dYt_new, dtheta_new = Newmark(Y0[0], dY0[0], t_init[0], dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, M, C, K, OMEGA_bal)
         t_init = tt_new[-1]
@@ -39,6 +42,9 @@ def saut_ampl(T, Vdc, Vac, omega0, M, C, K, OMEGA_bal, OMEGA_min, OMEGA_max, nb_
             liste_Yt_new[j+i*(len(Yt)),0] = Yt_new[j,0]
 
     return liste_dtheta,liste_Yt,liste_dtheta_new,liste_Yt_new
+
+# Fonction utilitaire pour charger les courbes de réponse depuis les fichiers texte
+# et les retourner pour affichage/comparaison
 
 def data_for_saut(delta_m):
     OME, AMPL = nk.recuperer_courbe_data('Courbes de réponse/courbe_reponse_masse_0e+00_up.txt')
