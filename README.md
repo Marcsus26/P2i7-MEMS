@@ -1,56 +1,47 @@
-# Visualisation des bassins d'attraction et analyse du saut d'amplitude dans un système MEMS non linéaire
+# Capteur MEMS résonant pour la mesure de masse ultra-précise
 
-Ce projet propose des outils de simulation et de visualisation pour l'étude des phénomènes non linéaires dans les capteurs MEMS, en particulier l'analyse des bassins d'attraction et du saut d'amplitude lors de l'ajout de masse.
+Ce projet modélise et simule le comportement d’un capteur MEMS résonant pour la mesure de très faibles masses, à l’aide de méthodes numériques avancées.
 
 ## Description
 
-Le code permet de :
+Le capteur étudié est basé sur une nano-poutre soumise à une force électrostatique. L’ajout d’une masse modifie la fréquence de résonance du système, ce qui permet de quantifier la masse déposée. Deux méthodes numériques sont explorées :
 
-- Simuler la réponse dynamique d'un résonateur MEMS soumis à une excitation harmonique.
-- Visualiser les bassins d'attraction et les courbes de réponse (amplitude/fréquence) pour différentes conditions (avant et après ajout de masse).
-- Animer l'évolution du système dans un notebook Jupyter, avec une gestion correcte de l'affichage pour éviter les figures blanches ou clignotantes.
+- **Mesure du décalage en fréquence** : suivi de la variation de la fréquence de résonance en fonction de la masse ajoutée.
+- **Détection par saut d’amplitude** : détection d’un saut d’amplitude lors d’un balayage en fréquence, permettant de détecter des masses encore plus faibles.
 
-Les principaux fichiers et modules :
+Les résultats montrent la faisabilité de ces approches et ouvrent la voie à la conception de capteurs MEMS/NEMS de très haute sensibilité.
 
-- `jupyter-MEMS.ipynb` : Notebook principal pour la visualisation et l'animation.
-- `saut_final.py` : Script d'analyse du saut d'amplitude.
-- `newmark.py`, `newmark_saut.py`, `newmark_masse_ajoutee.py` : Modules d'intégration numérique (méthode de Newmark) adaptés au système MEMS.
-- `trace_delta_m_f.py` : Outils de tracé pour l'analyse de la variation de masse.
-- `Courbes de réponse/` : Dossier contenant les courbes de réponse pré-calculées pour différentes valeurs de masse.
-  
-## Utilisation
+## Structure du projet
 
-1. **Installation des dépendances**
+- `newmark.py`, `newmark_masse_ajoutee.py`, `newmark_saut.py` : modules de calcul et d’intégration numérique (méthode de Newmark, courbes de réponse, etc.)
+- `trace_delta_m_f.py` : analyse du décalage en fréquence en fonction de la masse ajoutée
+- `saut_final.py` : simulation du saut d’amplitude
+- `Courbes de réponse/` : données de courbes de réponse pré-calculées
+- `jupyter-MEMS.ipynb` : rapport interactif et visualisations
 
-   Installez les dépendances Python nécessaires :
+## Installation
 
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Utilisation
-
-1. **Installation des dépendances**
-   Installez les dépendances Python nécessaires :
+1. Cloner le dépôt
+2. Installer les dépendances Python :
 
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Lancement des simulations**
-   - Ouvrez le notebook `jupyter-MEMS.ipynb` pour explorer les animations et visualisations interactives.
-   - Utilisez `saut_final.py` pour générer et analyser les courbes de saut d'amplitude.
+## Utilisation
 
-3. **Organisation des données**
-   Les courbes de réponse doivent être placées dans le dossier `Courbes de réponse/` avec la nomenclature attendue (voir le notebook ou le script pour les noms de fichiers).
+- Lancer les scripts Python pour générer les courbes de réponse et les analyses.
+- Ouvrir le notebook `jupyter-MEMS.ipynb` pour explorer le rapport interactif et les visualisations.
 
 ## Dépendances principales
 
-- `numpy` : Calcul numérique
-- `matplotlib` : Visualisation et animation
-- `numba` : Accélération des calculs (JIT)
-- `ipython` : Affichage interactif dans les notebooks (clear_output, display)
+Voir `requirements.txt` pour la liste complète.
 
-## Licence
+## Auteurs
 
-Ce projet est distribué sous licence MIT.
+- Thomas Bertrand
+- Marc Doumit
+- Taihani Chan
+- Tristan Hausermann
+
+Référent : Sébastien Baguet
