@@ -3,7 +3,6 @@ import numpy as np
 from numpy import zeros
 import matplotlib.pyplot as plt
 
-# Define functions with numba acceleration
 @njit(fastmath=True)
 def calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal):
     OMEGA_c = (OMEGA_max + OMEGA_min)/2
@@ -43,7 +42,7 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
         P, dtheta = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)
         l_dtheta.append(dtheta)
         res = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)[0] - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
-        normres = np.abs(res / P)  # Use numpy.abs for array compatibility
+        normres = np.abs(res / P)
 
         while normres > precNR:
             dFY, dFdY = calc_dFnl(T, Vdc, Y)
@@ -54,7 +53,6 @@ def Newmark(Y0, dY0, t_init, dt, NT, omega0, T, Vdc, Vac, OMEGA_min, OMEGA_max, 
             ddY += (4 / dt**2) * deltaY
             res = calc_P(T, Vdc, Vac, OMEGA_min, OMEGA_max, t, OMEGA_bal)[0] - M * ddY - C * dY - K * Y - calc_Fnl(T, Vdc, Y)
             normres = np.abs(deltaY / Y)
-            # print(Y)
 
         tt[n], Yt[n], dYt[n] = t, Y, dY
 
@@ -79,34 +77,7 @@ def compute_response_curve(T, Vdc, Vac, omega0, M, C, K, OMEGA_debut, OMEGA_fin,
         k += 1
     
     val = -1000
-
-    # if dOMEGAinit < 0:
-    #     i_max = 0
-    #     for i in range(len(AMPL)):
-    #         if AMPL[i] > AMPL[i_max]:
-    #             i_max = i
-    #     val = OME[i_max]
-
-    #     npas = int(abs((OMEGA_fin - OMEGA_debut) / dOMEGAinit) + 1 + (0.002) / tolerance)
-    #     OME, AMPL = zeros((npas, 1)), zeros((npas, 1))
-    #     Y0, dY0 = 0.25, 0
-    #     k, OMEGA = 0, OMEGA_debut
-
-    #     while (dOMEGAinit > 0 and OMEGA <= OMEGA_fin) or (dOMEGAinit < 0 and OMEGA >= OMEGA_fin):
-    #         OME[k] = OMEGA
-    #         if (val - 0.001) < OME[k] and (val + 0.001) > OME[k]:
-    #             dOMEGA = -tolerance
-    #         else:
-    #             dOMEGA = dOMEGAinit
-    #         periode = 2 * np.pi / OMEGA
-    #         dt = periode / nb_pts_per
-    #         NT = nb_per * nb_pts_per
-    #         tt, Yt, dYt, l_theta = Newmark(Y0, dY0, 0, dt, NT, omega0, T, Vdc, Vac, OMEGA, OMEGA, M, C, K, OMEGA_bal)
-    #         AMPL[k] = max(Yt[-3 * nb_pts_per:])
-    #         Y0, dY0 = Yt[-1, 0], dYt[-1, 0]
-    #         OMEGA += dOMEGA
-    #         k += 1
-
+    
     return OME[:k], AMPL[:k]
 
 def plot_response_curve(OME, AMPL, OME2, AMPL2, OMEGA_data, AMPL_data, ax, deltam=0, tracer_data=False):
