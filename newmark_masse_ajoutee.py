@@ -8,6 +8,7 @@ import newmark as nk
 from numba import njit
 
 # Calcule la courbe de réponse (amplitude vs pulsation) pour un MEMS avec masse ajoutée
+@njit(fastmath=True)
 def courbe_reponse_delta_m(OMEGA_debut, OMEGA_fin, dOMEGA, deltam=0, montee=False, data = False):
     T, Vdc, Vac, omega0, M, C, K, d = nk.init_params(deltam)  # Initialisation des paramètres avec masse ajoutée
     nb_pts_per, nb_per = 50, 500  # Paramètres numériques
